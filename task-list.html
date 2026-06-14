@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task List - TaskFlow</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    nav {
+      margin-bottom: 16px;
+    }
+
+    .filters {
+      margin: 12px 0;
+    }
+
+    .filters button {
+      margin-right: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid #d2d2d2;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    .status-pending {
+      color: #c47a00;
+      font-weight: 600;
+    }
+
+    .status-completed {
+      color: #0d8b38;
+      font-weight: 600;
+    }
+
+    .hidden-row {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a> |
+    <a href="add-task.html">Add Task</a> |
+    <a href="task-list.html">Task List</a> |
+    <a href="task-detail.html">Task Detail</a> |
+    <a href="about.html">About</a>
+  </nav>
+
+  <h1>Task List</h1>
+  <p>Track all tasks and quickly filter by current completion status.</p>
+
+  <section class="filters" aria-label="Task Status Filters">
+    <button type="button" data-filter="all">All</button>
+    <button type="button" data-filter="pending">Pending</button>
+    <button type="button" data-filter="completed">Completed</button>
+  </section>
+
+  <table aria-label="All Tasks">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Due Date</th>
+        <th>Priority</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-status="pending">
+        <td>Finalize sprint board</td>
+        <td>2026-06-17</td>
+        <td>High</td>
+        <td class="status-pending">Pending</td>
+      </tr>
+      <tr data-status="completed">
+        <td>Prepare Docker deployment notes</td>
+        <td>2026-06-14</td>
+        <td>Medium</td>
+        <td class="status-completed">Completed</td>
+      </tr>
+      <tr data-status="pending">
+        <td>Review pull request feedback</td>
+        <td>2026-06-18</td>
+        <td>Low</td>
+        <td class="status-pending">Pending</td>
+      </tr>
+      <tr data-status="completed">
+        <td>Sync with team lead</td>
+        <td>2026-06-13</td>
+        <td>High</td>
+        <td class="status-completed">Completed</td>
+      </tr>
+      <tr data-status="pending">
+        <td>Document CI screenshot evidence</td>
+        <td>2026-06-19</td>
+        <td>Medium</td>
+        <td class="status-pending">Pending</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    const filterButtons = document.querySelectorAll("[data-filter]");
+    const taskRows = document.querySelectorAll("tbody tr");
+
+    function applyFilter(filter) {
+      taskRows.forEach((row) => {
+        const rowStatus = row.getAttribute("data-status");
+        const shouldShow = filter === "all" || rowStatus === filter;
+        row.classList.toggle("hidden-row", !shouldShow);
+      });
+    }
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        applyFilter(button.getAttribute("data-filter"));
+      });
+    });
+  </script>
+</body>
+</html>
