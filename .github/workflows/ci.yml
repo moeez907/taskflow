@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Clone Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Build Docker Image
-        run: docker image build . -t moeez907/taskflow-cicd:latest
+        run: docker image build . -t moeez907/taskflow:latest
 
       - name: See the Image
         run: docker image ls
@@ -26,4 +26,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Push Docker Image on Docker Hub
-        run: docker image push moeez907/taskflow-cicd:latest
+        run: docker image push moeez907/taskflow:latest
