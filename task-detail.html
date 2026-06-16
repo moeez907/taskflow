@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Detail – TaskFlow</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* ── Navigation ───────────────────────────────────────────────── */
+    nav {
+      background: #1e40af;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.25);
+    }
+
+    nav .brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: .5px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: .25rem;
+    }
+
+    nav ul a {
+      color: #bfdbfe;
+      text-decoration: none;
+      padding: .4rem .75rem;
+      border-radius: 4px;
+      font-size: .9rem;
+      transition: background .15s, color .15s;
+    }
+
+    nav ul a:hover,
+    nav ul a.active {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    /* ── Main layout ──────────────────────────────────────────────── */
+    main {
+      max-width: 760px;
+      margin: 2rem auto;
+      padding: 0 1rem 3rem;
+    }
+
+    /* ── Back link ────────────────────────────────────────────────── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: #2563eb;
+      text-decoration: none;
+      font-size: .9rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    .back-link::before { content: '←'; }
+
+    /* ── Card ─────────────────────────────────────────────────────── */
+    .task-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.1), 0 4px 16px rgba(0,0,0,.06);
+      overflow: hidden;
+    }
+
+    /* card header */
+    .card-header {
+      background: #1e40af;
+      color: #fff;
+      padding: 1.4rem 1.75rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .card-header h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    /* status badge */
+    .badge {
+      display: inline-block;
+      padding: .25rem .7rem;
+      border-radius: 999px;
+      font-size: .8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: .2rem;
+    }
+
+    .badge.pending    { background: #fef9c3; color: #854d0e; }
+    .badge.completed  { background: #dcfce7; color: #166534; }
+
+    /* card body */
+    .card-body {
+      padding: 1.75rem;
+    }
+
+    /* detail grid */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+
+    .detail-item label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #64748b;
+      margin-bottom: .25rem;
+    }
+
+    .detail-item span {
+      font-size: .95rem;
+      color: #1e293b;
+    }
+
+    /* priority chips */
+    .priority-chip {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 4px;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+
+    .priority-chip.High   { background: #fee2e2; color: #991b1b; }
+    .priority-chip.Medium { background: #fef3c7; color: #92400e; }
+    .priority-chip.Low    { background: #e0f2fe; color: #075985; }
+
+    /* description section */
+    .description-section {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1.25rem;
+      margin-top: .5rem;
+    }
+
+    .description-section label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #64748b;
+      margin-bottom: .5rem;
+    }
+
+    .description-section p {
+      font-size: .95rem;
+      line-height: 1.65;
+      color: #334155;
+    }
+
+    /* ── Action buttons ───────────────────────────────────────────── */
+    .actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1.25rem 1.75rem;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter .15s, transform .1s;
+      text-decoration: none;
+    }
+
+    .btn:hover  { filter: brightness(1.08); }
+    .btn:active { transform: scale(.97); }
+
+    .btn-complete {
+      background: #16a34a;
+      color: #fff;
+    }
+
+    .btn-delete {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    /* ── Confirmation dialog overlay ──────────────────────────────── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.active { display: flex; }
+
+    .dialog {
+      background: #fff;
+      border-radius: 10px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,.2);
+      text-align: center;
+    }
+
+    .dialog h2 { font-size: 1.1rem; margin-bottom: .75rem; color: #1e293b; }
+    .dialog p  { font-size: .9rem; color: #475569; margin-bottom: 1.5rem; }
+
+    .dialog-actions {
+      display: flex;
+      gap: .75rem;
+      justify-content: center;
+    }
+
+    .btn-cancel {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    /* ── Toast notification ───────────────────────────────────────── */
+    .toast {
+      display: none;
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #1e293b;
+      color: #fff;
+      padding: .75rem 1.25rem;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+      z-index: 200;
+      animation: slideUp .25s ease;
+    }
+
+    .toast.show { display: block; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ─────────────────────────────────────────────── -->
+  <nav>
+    <a href="index.html" class="brand">TaskFlow</a>
+    <ul>
+      <li><a href="index.html">Dashboard</a></li>
+      <li><a href="task-list.html">Task List</a></li>
+      <li><a href="add-task.html">Add Task</a></li>
+      <li><a href="task-detail.html" class="active">Task Detail</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── Page content ───────────────────────────────────────────── -->
+  <main>
+    <a href="task-list.html" class="back-link">Back to Task List</a>
+
+    <div class="task-card" id="taskCard">
+
+      <!-- Card Header -->
+      <div class="card-header">
+        <h1 id="taskTitle">Fix login page validation bug</h1>
+        <span class="badge pending" id="taskBadge">Pending</span>
+      </div>
+
+      <!-- Card Body -->
+      <div class="card-body">
+
+        <div class="detail-grid">
+
+          <div class="detail-item">
+            <label>Due Date</label>
+            <span id="taskDueDate">25 Jun 2026</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Priority</label>
+            <span class="priority-chip High" id="taskPriority">High</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Assigned To</label>
+            <span id="taskAssignee">Sara Ahmed</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Created On</label>
+            <span id="taskCreatedOn">10 Jun 2026</span>
+          </div>
+
+        </div><!-- /.detail-grid -->
+
+        <div class="description-section">
+          <label>Description</label>
+          <p id="taskDescription">
+            The login form currently allows submission without checking that the
+            email field is a valid email address format and that the password is
+            at least 8 characters long. This causes misleading error messages from
+            the backend. The fix should add client-side validation before the form
+            is submitted, display inline error messages beneath the relevant fields,
+            and prevent the submit button from triggering an API call when fields
+            are empty or invalid.
+          </p>
+        </div>
+
+      </div><!-- /.card-body -->
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button class="btn btn-complete" id="btnComplete" onclick="handleComplete()">
+          ✔ Mark as Complete
+        </button>
+        <button class="btn btn-delete" onclick="openDeleteDialog()">
+          🗑 Delete Task
+        </button>
+      </div>
+
+    </div><!-- /.task-card -->
+  </main>
+
+  <!-- ── Delete Confirmation Dialog ─────────────────────────────── -->
+  <div class="overlay" id="deleteOverlay">
+    <div class="dialog">
+      <h2>Delete this task?</h2>
+      <p>This action cannot be undone. The task will be permanently removed.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-cancel" onclick="closeDeleteDialog()">Cancel</button>
+        <button class="btn btn-delete" onclick="confirmDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast ──────────────────────────────────────────────────── -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* ── Mark as Complete ─────────────────────────────────────────── */
+    function handleComplete() {
+      const badge  = document.getElementById('taskBadge');
+      const btn    = document.getElementById('btnComplete');
+
+      const alreadyDone = badge.classList.contains('completed');
+
+      if (alreadyDone) {
+        // Toggle back to pending
+        badge.textContent = 'Pending';
+        badge.className   = 'badge pending';
+        btn.textContent   = '✔ Mark as Complete';
+        showToast('Task marked as pending.');
+      } else {
+        // Mark complete
+        badge.textContent = 'Completed';
+        badge.className   = 'badge completed';
+        btn.textContent   = '↩ Mark as Pending';
+        showToast('Task marked as complete!');
+      }
+    }
+
+    /* ── Delete dialog ────────────────────────────────────────────── */
+    function openDeleteDialog() {
+      document.getElementById('deleteOverlay').classList.add('active');
+    }
+
+    function closeDeleteDialog() {
+      document.getElementById('deleteOverlay').classList.remove('active');
+    }
+
+    function confirmDelete() {
+      closeDeleteDialog();
+      // In a real app this would call an API; here we simulate removal
+      document.getElementById('taskCard').style.opacity = '0.35';
+      document.getElementById('taskCard').style.pointerEvents = 'none';
+      showToast('Task deleted. Redirecting…');
+      setTimeout(() => { window.location.href = 'task-list.html'; }, 1800);
+    }
+
+    /* ── Toast helper ─────────────────────────────────────────────── */
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    /* ── Close overlay on backdrop click ─────────────────────────── */
+    document.getElementById('deleteOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeDeleteDialog();
+    });
+  </script>
+
+</body>
+</html>
